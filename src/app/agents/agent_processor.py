@@ -16,7 +16,8 @@ from app.servers.mcp_inventory_client import MCPShopperToolsClient
 
 from opentelemetry import trace
 
-# from azure.monitor.opentelemetry import configure_azure_monitor
+from azure.monitor.opentelemetry import configure_azure_monitor
+
 try:
     from azure.ai.agents.telemetry import trace_function
 except ImportError:
@@ -31,12 +32,12 @@ except ImportError:
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import time
-# from opentelemetry.instrumentation.openai_v2 import OpenAIInstrumentor
+from opentelemetry.instrumentation.openai_v2 import OpenAIInstrumentor
 
 # # Enable Azure Monitor tracing
 application_insights_connection_string = os.environ.get("APPLICATIONINSIGHTS_CONNECTION_STRING", "")
-# configure_azure_monitor(connection_string=application_insights_connection_string)
-# OpenAIInstrumentor().instrument()
+configure_azure_monitor(connection_string=application_insights_connection_string)
+OpenAIInstrumentor().instrument()
 
 # scenario = os.path.basename(__file__)
 # tracer = trace.get_tracer(__name__)
@@ -200,7 +201,7 @@ class AgentProcessor:
         print(f"[TIMELOG] Message creation took: {time.time() - start_time:.2f}s")
         messages = openai_client.responses.create(
             conversation=thread_id,
-            extra_body={"agent": {"name": self.agent_id, "type": "agent_reference"}},
+            extra_body={"agent_reference": {"name": self.agent_id, "type": "agent_reference"}},
             input="",
             stream=True,
         )
@@ -234,7 +235,7 @@ class AgentProcessor:
             # Message retrieval
             message = openai_client.responses.create(
                 conversation=thread_id,
-                extra_body={"agent": {"name": self.agent_id, "type": "agent_reference"}},
+                extra_body={"agent_reference": {"name": self.agent_id, "type": "agent_reference"}},
                 input="",
                 stream=False,
             )
@@ -274,7 +275,7 @@ class AgentProcessor:
                 message = openai_client.responses.create(
                     input=input_list,
                     previous_response_id=message.id,
-                    extra_body={"agent": {"name": self.agent_id, "type": "agent_reference"}},
+                    extra_body={"agent_reference": {"name": self.agent_id, "type": "agent_reference"}},
                 )
 
             # Robustly extract all text values from all blocks

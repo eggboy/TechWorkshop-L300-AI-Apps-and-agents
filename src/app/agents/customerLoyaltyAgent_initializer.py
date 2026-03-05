@@ -24,3 +24,16 @@ project_client = AIProjectClient(
     endpoint=project_endpoint,
     credential=DefaultAzureCredential(),
 )
+
+# Define the set of user-defined callable functions to use as tools (from MCP client)
+functions = create_function_tool_for_agent("customer_loyalty")
+
+
+initialize_agent(
+    project_client=project_client,
+    model=os.environ["gpt_deployment"],
+    name="customer-loyalty",
+    description="Zava Customer Loyalty Agent",
+    instructions=CL_PROMPT,
+    tools=functions
+)
