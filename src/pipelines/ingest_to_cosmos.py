@@ -1,12 +1,12 @@
-import logging
 import json
+import logging
 import os
 from typing import Any
-import requests
 
+import requests
+from azure.core.exceptions import AzureError
 from azure.cosmos import CosmosClient, PartitionKey
 from azure.identity import DefaultAzureCredential
-from azure.core.exceptions import AzureError
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -59,7 +59,7 @@ def get_cosmos_client(endpoint: str | None, key: str | None = None):
 
 
 def load_json_items(path: str) -> list[dict[str, Any]]:
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         data = json.load(f)
 
     if isinstance(data, list):

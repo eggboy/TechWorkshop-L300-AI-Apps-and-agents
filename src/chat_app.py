@@ -1,56 +1,52 @@
 # Core Libraries
-import os
 import asyncio
 import datetime
+import logging
+import os
 import time
 import uuid
 from collections import deque
-from typing import Deque, Tuple, Optional, Dict
 from concurrent.futures import ThreadPoolExecutor
+
 import orjson  # Faster JSON library
-from dotenv import load_dotenv
-from opentelemetry import trace
-import logging
-from opentelemetry.instrumentation.openai_v2 import OpenAIInstrumentor
 
 # Azure & OpenAI Imports
 from azure.ai.projects import AIProjectClient
 from azure.identity import DefaultAzureCredential
-from openai import AzureOpenAI
 from azure.monitor.opentelemetry import configure_azure_monitor
-from azure.ai.agents.telemetry import trace_function
+from dotenv import load_dotenv
 
 # FastAPI Imports
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
+from opentelemetry import trace
+from opentelemetry.instrumentation.openai_v2 import OpenAIInstrumentor
 
-# Custom Utilities
-from utils.history_utils import (
-    format_chat_history,
-    redact_bad_prompts_in_history,
-    clean_conversation_history,
-    parse_conversation_history,
-)
-from utils.response_utils import extract_bot_reply, parse_agent_response, extract_product_names_from_response
-from utils.log_utils import log_timing, log_cache_status
-from utils.env_utils import load_env_vars, validate_env_vars
-from utils.message_utils import (
-    IMAGE_UPLOAD_MESSAGES,
-    IMAGE_CREATE_MESSAGES,
-    IMAGE_ANALYSIS_MESSAGES,
-    get_rotating_message,
-    fast_json_dumps,
-)
+from app.servers.mcp_inventory_server import mcp as inventory_mcp
+from app.tools.aiSearchTools import product_recommendations
+from app.tools.imageCreationTool import create_image
 
 # Agent Imports
 from app.tools.understandImage import get_image_description
 from services.agent_service import get_or_create_agent_processor
-from app.tools.singleAgentExample import generate_response
-from app.tools.aiSearchTools import product_recommendations
-from app.tools.imageCreationTool import create_image
-from app.servers.mcp_inventory_server import mcp as inventory_mcp
 from services.handoff_service import HandoffService
+from utils.env_utils import load_env_vars, validate_env_vars
 
+# Custom Utilities
+from utils.history_utils import (
+    clean_conversation_history,
+    format_chat_history,
+    parse_conversation_history,
+    redact_bad_prompts_in_history,
+)
+from utils.log_utils import log_cache_status, log_timing
+from utils.message_utils import (
+    IMAGE_ANALYSIS_MESSAGES,
+    IMAGE_CREATE_MESSAGES,
+    fast_json_dumps,
+    get_rotating_message,
+)
+from utils.response_utils import extract_bot_reply, extract_product_names_from_response, parse_agent_response
 
 load_dotenv()
 env_vars = load_env_vars()
@@ -145,7 +141,7 @@ handoff_service = HandoffService(
 @app.get("/")
 async def get():
     chat_html_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chat.html")
-    with open(chat_html_path, "r", encoding="utf-8") as f:
+    with open(chat_html_path, encoding="utf-8") as f:
         return HTMLResponse(f.read())
 
 
@@ -173,7 +169,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
     await websocket.accept()
 
-    chat_history: Deque[Tuple[str, str]] = deque(maxlen=5)
+    chat_history: deque[tuple[str, str]] = deque(maxlen=5)
 
     # Session-level state variables
     customer_loyalty_executed = False  # Flag to track if customer loyalty task has been executed
@@ -245,7 +241,7 @@ async def websocket_endpoint(websocket: WebSocket):
             except WebSocketDisconnect:
                 logger.info("WebSocket connection terminated - client disconnected from endpoint")
                 break
-            except Exception as e:
+            except Exception:
                 logger.error("Error parsing message", exc_info=True)
                 user_message = data if "data" in locals() else ""
                 image_data = None
@@ -655,8 +651,8 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
 if __name__ == "__main__":
-    import datetime
     import atexit
+    import datetime
 
     # Register cleanup function
     def cleanup():

@@ -1,8 +1,8 @@
 import json
 import sys
-from dotenv import load_dotenv
 from pathlib import Path
-from typing import Dict, Any
+
+from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 
 env_path = Path(__file__).parent.parent.parent / '.env'
@@ -15,8 +15,7 @@ else:
 # Add src directory to Python path
 src_path = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(src_path))
-from app.tools import product_recommendations, inventory_check, calculate_discount, create_image
-
+from app.tools import calculate_discount, create_image, inventory_check, product_recommendations
 
 """
 MCP Server for Shopping Inventory and Customer Loyalty Tools
@@ -33,8 +32,7 @@ mcp = FastMCP("MCP Shop Inventory Server")
 ### MCP Tools ###
 @mcp.tool()
 def get_product_recommendations(question: str) -> str:
-    """
-    Search for product recommendations based on user query.
+    """Search for product recommendations based on user query.
     
     Args:
         question: Natural language user query describing what products they're looking for
@@ -47,8 +45,7 @@ def get_product_recommendations(question: str) -> str:
 
 @mcp.tool()
 def check_product_inventory(product_id: str) -> str:
-    """
-    Check inventory availability for a specific product.
+    """Check inventory availability for a specific product.
     
     Args:
         product_id: The unique product ID to check inventory for
@@ -62,8 +59,7 @@ def check_product_inventory(product_id: str) -> str:
 
 @mcp.tool()
 def get_customer_discount(customer_id: str) -> str:
-    """
-    Calculate available discounts for a customer based on their purchase history.
+    """Calculate available discounts for a customer based on their purchase history.
     
     Args:
         customer_id: The customer's unique identifier
@@ -76,8 +72,7 @@ def get_customer_discount(customer_id: str) -> str:
 
 @mcp.tool()
 def generate_product_image(prompt: str, size: str = "1024x1024") -> str:
-    """
-    Generate an AI image based on a text description using DALL-E.
+    """Generate an AI image based on a text description using DALL-E.
     
     Args:
         prompt: Detailed description of the image to generate
@@ -97,7 +92,7 @@ PROMPTS_DIR = Path(__file__).parent.parent.parent / 'prompts'
 def read_prompt_file(filename: str) -> str:
     """Read a prompt file from the prompts directory."""
     file_path = PROMPTS_DIR / filename
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, encoding='utf-8') as f:
         return f.read()
 
 @mcp.prompt(title="AI Search Tool Prompt")
@@ -108,8 +103,7 @@ def aiSearchToolPrompt(srch_result: str, question: str) -> str:
 
 @mcp.prompt(title="Agent Prompt")
 def agentPrompt(agent_name: str) -> str:
-    """
-    Returns the appropriate agent prompt based on the agent name.
+    """Returns the appropriate agent prompt based on the agent name.
     
     Args:
         agent_name: One of 'cora', 'customer_loyalty', 'discount_logic', 'interior_designer', or 'inventory'
@@ -121,7 +115,7 @@ def agentPrompt(agent_name: str) -> str:
         "interior_designer": "InteriorDesignAgentPrompt.txt",
         "inventory": "InventoryAgentPrompt.txt"
     }
-    
+
     agent_name_lower = agent_name.lower()
     if agent_name_lower in prompt_files:
         return read_prompt_file(prompt_files[agent_name_lower])

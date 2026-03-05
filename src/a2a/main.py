@@ -1,17 +1,16 @@
-import os
 import logging
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 import httpx
+from agent.a2a_server import A2AServer
+from api.chat import router as chat_router
+from dotenv import load_dotenv
 from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
-from dotenv import load_dotenv
-
-from api.chat import router as chat_router
-from agent.a2a_server import A2AServer
 
 # Load environment variables
 load_dotenv()
@@ -29,26 +28,26 @@ a2a_server: A2AServer = None
 async def lifespan(app: FastAPI):
     """Manage application lifespan"""
     global httpx_client, a2a_server
-    
+
     # Startup
     logger.info("Starting Zava Product Manager with A2A integration...")
     httpx_client = httpx.AsyncClient(timeout=30)
-    
+
     # Initialize A2A server
     host = os.getenv("HOST", "0.0.0.0")
     port = int(os.getenv("PORT", 8001))
     a2a_server = A2AServer(httpx_client, host=host, port=port)
-    
+
     # Mount A2A endpoints to the main app
     app.mount("/a2a", a2a_server.get_starlette_app(), name="a2a")
-    
+
     logger.info(
         f"A2A server mounted at / - Agent Card available at "
         f"http://{host}:{port}/agent-card/"
     )
-    
+
     yield
-    
+
     # Shutdown
     logger.info("Shutting down Zava Product Manager...")
     if httpx_client:
@@ -99,9 +98,9 @@ async def get_agent_card():
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     host = os.getenv("HOST", "0.0.0.0")
     port = int(os.getenv("PORT", 8001))
     debug = os.getenv("DEBUG", "false").lower() == "true"
-    
+
     uvicorn.run(app, host=host, port=port, reload=debug)

@@ -1,9 +1,9 @@
 from dotenv import load_dotenv
+
 load_dotenv()
 
 def inventory_check(product_dict: dict) -> list:
-    """
-    Simulates checking for inventory details from Microsoft Fabric.
+    """Simulates checking for inventory details from Microsoft Fabric.
 
     Args:
         product_dict (dict): Keys are product names, values are product IDs.
@@ -11,7 +11,6 @@ def inventory_check(product_dict: dict) -> list:
     Returns:
         list: Each element is the matching row if the product ID is found, otherwise None.
     """
-
     # Simulated data
     product_inventory = {
         'PROD0001': {'ProductName': 'Pale Meadow', 'QuantityInStock': 312, 'Price': 29.99},

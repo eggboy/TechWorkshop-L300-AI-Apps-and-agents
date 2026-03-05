@@ -1,13 +1,13 @@
 import os
+
 import pandas as pd
-from openai import AzureOpenAI
 from dotenv import load_dotenv
+from openai import AzureOpenAI
 
 load_dotenv()
 
-from opentelemetry import trace
-
 from azure.monitor.opentelemetry import configure_azure_monitor
+from opentelemetry import trace
 
 try:
     from azure.ai.agents.telemetry import trace_function
@@ -21,6 +21,7 @@ except ImportError:
 
 
 import time
+
 from opentelemetry.instrumentation.openai_v2 import OpenAIInstrumentor
 
 # Enable Azure Monitor tracing
@@ -40,7 +41,7 @@ api_version = os.getenv("gpt_api_version")
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(os.path.dirname(current_dir))  # Go up 2 levels from src/tools/ to root
 PROMPT_PATH = os.path.join(project_root, "prompts", "DiscountLogicPrompt.txt")
-with open(PROMPT_PATH, "r") as file:
+with open(PROMPT_PATH) as file:
     PROMPT = file.read()
 
 

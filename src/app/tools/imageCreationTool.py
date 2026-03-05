@@ -1,12 +1,13 @@
 import base64
-import requests
-from io import BytesIO
-from PIL import Image
-from azure.storage.blob import BlobServiceClient, ContentSettings
 import os
-from dotenv import load_dotenv
-from uuid import uuid4
 import sys
+from io import BytesIO
+from uuid import uuid4
+
+import requests
+from dotenv import load_dotenv
+from PIL import Image
+
 sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
 from utils.storage_utils import get_storage_manager
 
@@ -24,8 +25,7 @@ subscription_key = os.getenv("subscription_key")
 HEXCODES = "\n\n Hexcodes to strictly follow for paint: \n Pale Meadow: #b6c9bb, Tranquil Lavender: #bdb4bf, Whispering Blue: #9fbbc2, Whispering Blush: #d4b9a4, Ocean Mist: #aec3b7, Sunset Coral: #d25e2e, Forest Whisper: #788c6f, Morning Dew: #596c76, Dusty Rose: #ac9187, Sage Harmony: #bec7be, Vanilla Dream: #a39b8b, Charcoal Storm: #6b6c6a, Golden Wheat: #cfac5b, Soft Pebble: #bfb8a9, Misty Gray: #9da2a3, Rustic Clay: #a78982, Ivory Pearl: #937c6e, Deep Forest: #4a5846, Autumn Spice: #bc8567, Coastal Whisper: #acb7b9, Effervescent Jade: #586e57, Frosted Blue: #cacec8, Frosted Lemon: #d2ce8d, Honeydew Sunrise: #d6ca9d, Lavender Whisper: #dbdadf, Lilac Mist: #cdcddb, Soft Creamsicle: #ddbba6. \n\n If image is outside of these colors or something different is asked, please reject the request and ask for a different color or theme. \n\n"
 
 def create_image(text, image_url):
-    """
-    Creates an edited image using the Azure OpenAI gpt-image-1 model based on a given text prompt and an input image, uploads the resulting image to Azure Blob Storage, and returns the URL to the uploaded image.
+    """Creates an edited image using the Azure OpenAI gpt-image-1 model based on a given text prompt and an input image, uploads the resulting image to Azure Blob Storage, and returns the URL to the uploaded image.
 
     Args:
         text (str): The prompt describing the desired edit or transformation to apply to the input image.
@@ -34,7 +34,7 @@ def create_image(text, image_url):
     Returns:
         str or None: The URL of the uploaded, edited image in Azure Blob Storage if successful; otherwise, None if an error occurs at any step.
     """
-    
+
     def upload_image_to_blob(pil_image):
         try:
             img_byte_arr = BytesIO()
@@ -45,7 +45,7 @@ def create_image(text, image_url):
             storage_manager = get_storage_manager()
 
             blob_name = f"image_{uuid4().hex}.png"
-            
+
             blob_url = storage_manager.upload_blob(
                 blob_name=blob_name,
                 data=img_byte_arr,
@@ -118,6 +118,6 @@ def create_image(text, image_url):
         data=edit_body,
         files=files
     ).json()
-    
+
     url = save_all_images_from_response(edit_response)
     return url

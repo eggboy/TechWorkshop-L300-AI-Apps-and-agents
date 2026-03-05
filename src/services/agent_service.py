@@ -1,7 +1,7 @@
-from app.agents.agent_processor import AgentProcessor
-from typing import Dict
 
-_agent_processor_cache: Dict[str, AgentProcessor] = {}
+from app.agents.agent_processor import AgentProcessor
+
+_agent_processor_cache: dict[str, AgentProcessor] = {}
 
 def get_or_create_agent_processor(agent_id: str, agent_type: str, thread_id: str, project_client) -> AgentProcessor:
     """Get cached AgentProcessor or create new one to avoid repeated initialization."""
@@ -17,4 +17,4 @@ def get_or_create_agent_processor(agent_id: str, agent_type: str, thread_id: str
         thread_id=thread_id
     )
     _agent_processor_cache[cache_key] = processor
-    return processor 
+    return processor

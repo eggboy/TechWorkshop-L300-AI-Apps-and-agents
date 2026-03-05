@@ -1,12 +1,14 @@
 import os
 import sys
+
 import requests
+from azure.core.exceptions import AzureError
 from azure.cosmos import CosmosClient
 from azure.identity import DefaultAzureCredential
-from azure.core.exceptions import AzureError
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # Cosmos DB configuration (replace previous search env vars)
@@ -79,14 +81,12 @@ _container = _database.get_container_client(CONTAINER_NAME)
 
 
 def product_recommendations(question: str, top_k: int = 8):
-    """
-    Input:
+    """Input:
         question (str): Natural language user query
         top_k (int): number of nearest neighbors to return
     Output:
         list of product dicts with product information
     """
-
     # Generate embedding for the query
     query_vector = get_request_embedding(question)
     if query_vector is None:

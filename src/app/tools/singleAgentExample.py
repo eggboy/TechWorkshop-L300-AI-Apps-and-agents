@@ -1,9 +1,8 @@
 import os
-import base64
-from openai import AzureOpenAI
-from dotenv import load_dotenv
-import numpy as np
 import time
+
+from dotenv import load_dotenv
+from openai import AzureOpenAI
 
 load_dotenv()
 
@@ -25,8 +24,7 @@ def _get_client():
 
 
 def generate_response(text_input):
-    """
-    Input:
+    """Input:
         text_input (str): The user's chat input.
 
     Output:

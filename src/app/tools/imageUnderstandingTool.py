@@ -1,9 +1,10 @@
 import base64
+import os
 from mimetypes import guess_type
-import os  
-import base64
-from openai import AzureOpenAI  
+
 from dotenv import load_dotenv
+from openai import AzureOpenAI
+
 load_dotenv()
 
 azure_deployment = os.environ.get("gpt_deployment")
@@ -21,15 +22,17 @@ az_model_client = AzureOpenAI(
 
 
 def image_describing_tool(image_input, conversation_history, query = None, mime_type=None):
-    """
-    Tool to describe an image using an Azure OpenAI GPT model.
+    """Tool to describe an image using an Azure OpenAI GPT model.
+
     Args:
         image_input (str or bytes): Image URL, local file path, or bytes.
         conversation_history (str): Previous conversation history.
         query (str, optional): Additional query to provide context.
         mime_type (str, optional): MIME type of the image if known.
+
     Returns:
-        str: Description of the image or error message."""
+        str: Description of the image or error message.
+    """
     try:
         if isinstance(image_input, str):
             if image_input.startswith("http://") or image_input.startswith("https://"):
@@ -60,7 +63,7 @@ def image_describing_tool(image_input, conversation_history, query = None, mime_
         else:
             return "Error: image_input must be a URL, file path (str), or bytes object."
     except Exception as e:
-        return f"Error reading image: {str(e)}"
+        return f"Error reading image: {e!s}"
 
     # ----------------------------
     # Construct chat prompt
@@ -101,7 +104,7 @@ def image_describing_tool(image_input, conversation_history, query = None, mime_
         try:
             base64_encoded_data = base64.b64encode(image_bytes).decode('utf-8')
         except Exception as e:
-            return f"Error: failed to base64-encode image ({str(e)})."
+            return f"Error: failed to base64-encode image ({e!s})."
         chat_prompt.append({
             "role": "user",
             "content": [
@@ -136,9 +139,9 @@ def image_describing_tool(image_input, conversation_history, query = None, mime_
             stream=False
         )
     except Exception as e:
-        return f"Error: Model call failed ({str(e)}). Check network connection and credentials."
+        return f"Error: Model call failed ({e!s}). Check network connection and credentials."
 
     response_dict = completion.model_dump()
     response_message = response_dict["choices"][0]["message"]["content"]
-    
+
     return response_message

@@ -1,20 +1,22 @@
 import time
+
 from utils.log_utils import log_timing
+
 
 def call_fallback(llm_client, fallback_prompt: str, gpt_deployment = "gpt-5-mini"):
     """Call the fallback model and return its reply."""
     start_time = time.time()
-    
-    chat_prompt = [    
+
+    chat_prompt = [
         {
-            "role": "system",      
-            "content": 
-            [           
-                {               
-                    "type": "text",               
-                    "text": fallback_prompt           
-                }       
-            ]   
+            "role": "system",
+            "content":
+            [
+                {
+                    "type": "text",
+                    "text": fallback_prompt
+                }
+            ]
         }]
 
     messages = chat_prompt
@@ -30,17 +32,17 @@ def call_fallback(llm_client, fallback_prompt: str, gpt_deployment = "gpt-5-mini
 def cora_fallback(llm_client, fallback_prompt: str, gpt_deployment = "Phi-4"):
     """Call the fallback model for cora and return its reply."""
     start_time = time.time()
-    
-    chat_prompt = [    
+
+    chat_prompt = [
         {
-            "role": "system",      
-            "content": 
-            [           
-                {               
-                    "type": "text",               
-                    "text": fallback_prompt           
-                }       
-            ]   
+            "role": "system",
+            "content":
+            [
+                {
+                    "type": "text",
+                    "text": fallback_prompt
+                }
+            ]
         }]
 
     messages = chat_prompt

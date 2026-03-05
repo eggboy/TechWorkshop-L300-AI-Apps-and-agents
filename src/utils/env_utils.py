@@ -1,9 +1,10 @@
 import os
-from typing import Dict, Optional
+
 from dotenv import load_dotenv
+
 load_dotenv(override=True)
 
-def load_env_vars() -> Dict[str, Optional[str]]:
+def load_env_vars() -> dict[str, str | None]:
     """Load environment variables and return as a dictionary."""
     return {
         'interior_designer': os.getenv("interior_designer"),
@@ -25,7 +26,7 @@ def load_env_vars() -> Dict[str, Optional[str]]:
         'MCP_SERVER_URL': os.getenv("MCP_SERVER_URL"),
     }
 
-def validate_env_vars(env_vars: Dict[str, Optional[str]]) -> Dict[str, str]:
+def validate_env_vars(env_vars: dict[str, str | None]) -> dict[str, str]:
     """Validate that required environment variables are set and return validated dict."""
     required_vars = [
         'phi_4_endpoint', 'phi_4_api_key', 'phi_4_api_version', 'phi_4_deployment', 'MCP_SERVER_URL',

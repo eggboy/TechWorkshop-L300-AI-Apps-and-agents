@@ -2,19 +2,18 @@ import os
 import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from typing import List, Callable, Set, Any, Dict
-from azure.ai.projects.models import FunctionTool
-from openai.types.responses.response_input_param import FunctionCallOutput, ResponseInputParam
 import json
 
 # Import MCP client for tool execution
 import sys
 from pathlib import Path
+from typing import Any
+
+from azure.ai.projects.models import FunctionTool
+from openai.types.responses.response_input_param import FunctionCallOutput, ResponseInputParam
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from app.servers.mcp_inventory_client import MCPShopperToolsClient
 
-from opentelemetry import trace
 
 from azure.monitor.opentelemetry import configure_azure_monitor
 
@@ -30,8 +29,9 @@ except ImportError:
 
 
 import asyncio
-from concurrent.futures import ThreadPoolExecutor
 import time
+from concurrent.futures import ThreadPoolExecutor
+
 from opentelemetry.instrumentation.openai_v2 import OpenAIInstrumentor
 
 # # Enable Azure Monitor tracing
@@ -46,7 +46,7 @@ OpenAIInstrumentor().instrument()
 _executor = ThreadPoolExecutor(max_workers=8)
 
 # Cache for toolset configurations to avoid repeated initialization
-_toolset_cache: Dict[str, List[FunctionTool]] = {}
+_toolset_cache: dict[str, list[FunctionTool]] = {}
 
 from app.servers.mcp_inventory_client import get_mcp_client
 
@@ -55,8 +55,7 @@ _mcp_server_url = os.getenv("MCP_SERVER_URL", "http://localhost:8000/mcp-invento
 
 # MCP-based tool wrapper functions
 async def mcp_create_image(prompt: str) -> str:
-    """
-    Generate an AI image based on a text description using DALL-E.
+    """Generate an AI image based on a text description using DALL-E.
 
     Args:
         prompt: Detailed description of the image to generate
@@ -65,7 +64,6 @@ async def mcp_create_image(prompt: str) -> str:
     Returns:
         URL or path to the generated image
     """
-
     mcp_client = await get_mcp_client(_mcp_server_url)
     """Wrapper for create_image using MCP client"""
     loop = asyncio.new_event_loop()
@@ -78,8 +76,7 @@ async def mcp_create_image(prompt: str) -> str:
 
 
 def mcp_product_recommendations(question: str) -> str:
-    """
-    Search for product recommendations based on user query.
+    """Search for product recommendations based on user query.
 
     Args:
         question: Natural language user query describing what products they're looking for
@@ -104,8 +101,7 @@ def mcp_product_recommendations(question: str) -> str:
 
 
 def mcp_calculate_discount(customer_id: str) -> str:
-    """
-    Calculate the discount based on customer data.
+    """Calculate the discount based on customer data.
 
     Args:
         CustomerID (str): The ID of the customer.
@@ -130,9 +126,8 @@ def mcp_calculate_discount(customer_id: str) -> str:
 
 
 # Create wrapper function that uses MCP client
-def mcp_inventory_check(product_list: List[str]) -> list:
-    """
-    Check inventory for products using MCP client.
+def mcp_inventory_check(product_list: list[str]) -> list:
+    """Check inventory for products using MCP client.
 
     Args:
         product_list (List[str]): List of product IDs to check inventory for.
@@ -173,7 +168,7 @@ class AgentProcessor:
         # Use cached toolset or create new one
         self.toolset = self._get_or_create_toolset(agent_type)
 
-    def _get_or_create_toolset(self, agent_type: str) -> List[FunctionTool]:
+    def _get_or_create_toolset(self, agent_type: str) -> list[FunctionTool]:
         """Get cached toolset or create new one to avoid repeated initialization."""
         if agent_type in _toolset_cache:
             return _toolset_cache[agent_type]
@@ -302,20 +297,20 @@ class AgentProcessor:
             return result
 
         except Exception as e:
-            print(f"[ERROR] Conversation failed: {str(e)}")
-            return [f"Error processing message: {str(e)}"]
+            print(f"[ERROR] Conversation failed: {e!s}")
+            return [f"Error processing message: {e!s}"]
 
     async def run_conversation_with_text_stream(self, input_message: str = ""):
         """Async wrapper for conversation processing with better error handling."""
-        print(f"[DEBUG] Async conversation pipeline initiated - commencing message processing protocol", flush=True)
+        print("[DEBUG] Async conversation pipeline initiated - commencing message processing protocol", flush=True)
         loop = asyncio.get_event_loop()
         try:
             messages = await loop.run_in_executor(_executor, self._run_conversation_sync, input_message)
             for i, msg in enumerate(messages):
                 yield msg
         except Exception as e:
-            print(f"[ERROR] Async conversation failed: {str(e)}")
-            yield f"Error processing message: {str(e)}"
+            print(f"[ERROR] Async conversation failed: {e!s}")
+            yield f"Error processing message: {e!s}"
 
     @classmethod
     def clear_toolset_cache(cls):
@@ -329,7 +324,7 @@ class AgentProcessor:
         return {"toolset_cache_size": len(_toolset_cache), "cached_agent_types": list(_toolset_cache.keys())}
 
 
-def create_function_tool_for_agent(agent_type: str) -> List[Any]:
+def create_function_tool_for_agent(agent_type: str) -> list[Any]:
     define_mcp_create_image = FunctionTool(
         name="mcp_create_image",
         parameters={

@@ -1,5 +1,4 @@
-"""
-Handoff service using optimized domain-based routing pattern.
+"""Handoff service using optimized domain-based routing pattern.
 
 This replaces the legacy handoff logic with the Agent-based pattern
 from handoff_agent.py, providing:
@@ -9,11 +8,9 @@ from handoff_agent.py, providing:
 - Context transfer on handoff
 """
 
-import logging
-import os
-import random
 import json
-from typing import Any, Dict, Optional, Tuple
+import logging
+from typing import Any
 
 from openai import AzureOpenAI
 from pydantic import BaseModel, Field
@@ -56,8 +53,7 @@ AGENT_DOMAINS = {
 
 
 class HandoffService:
-    """
-    Handoff service using intent classification for domain routing.
+    """Handoff service using intent classification for domain routing.
 
     This class replaces the legacy call_handoff/select_agent pattern with
     a more robust intent classification approach.
@@ -70,8 +66,7 @@ class HandoffService:
         default_domain: str = "cora",
         lazy_classification: bool = True,
     ):
-        """
-        Initialize handoff service.
+        """Initialize handoff service.
 
         Args:
             azure_openai_client: Azure OpenAI client for intent classification
@@ -85,16 +80,15 @@ class HandoffService:
         self.lazy_classification = lazy_classification
 
         # Session state: domain per session
-        self._session_domains: Dict[str, str] = {}
+        self._session_domains: dict[str, str] = {}
 
         logger.info(
             f"[HANDOFF_SERVICE] Initialized with default_domain={default_domain}, "
             f"lazy_classification={lazy_classification}"
         )
 
-    def classify_intent(self, user_message: str, session_id: str, chat_history: Optional[str] = None) -> Dict[str, Any]:
-        """
-        Classify user intent and determine target domain.
+    def classify_intent(self, user_message: str, session_id: str, chat_history: str | None = None) -> dict[str, Any]:
+        """Classify user intent and determine target domain.
 
         Args:
             user_message: User's message to classify
@@ -183,7 +177,7 @@ class HandoffService:
                 "agent_name": AGENT_DOMAINS.get(fallback_domain, {}).get("name", "Unknown Agent"),
             }
 
-    def get_current_domain(self, session_id: str) -> Optional[str]:
+    def get_current_domain(self, session_id: str) -> str | None:
         """Get current domain for a session."""
         return self._session_domains.get(session_id)
 

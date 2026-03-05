@@ -1,5 +1,5 @@
-import json
 from chat_app import parse_agent_response
+
 
 def test_parse_agent_response():
     # Test case 1: New list format with answer, products, and image_output
@@ -20,7 +20,7 @@ def test_parse_agent_response():
     ]
   }
 ]'''
-    
+
     result_1 = parse_agent_response(test_response_1)
     print("Test 1 - List format:")
     print(f"Answer: {result_1['answer']}")
@@ -28,7 +28,7 @@ def test_parse_agent_response():
     print(f"Image URL: {result_1['image_url']}")
     print(f"Agent: {result_1['agent']}")
     print()
-    
+
     # Test case 2: Old dict format
     test_response_2 = '''{
         "answer": "This is a test answer",
@@ -36,7 +36,7 @@ def test_parse_agent_response():
         "products": "test_products",
         "image_url": "test_image.jpg"
     }'''
-    
+
     result_2 = parse_agent_response(test_response_2)
     print("Test 2 - Dict format:")
     print(f"Answer: {result_2['answer']}")
@@ -44,10 +44,10 @@ def test_parse_agent_response():
     print(f"Image URL: {result_2['image_url']}")
     print(f"Agent: {result_2['agent']}")
     print()
-    
+
     # Test case 3: Plain string (not JSON)
     test_response_3 = "This is a plain text response"
-    
+
     result_3 = parse_agent_response(test_response_3)
     print("Test 3 - Plain string:")
     print(f"Answer: {result_3['answer']}")
@@ -55,10 +55,10 @@ def test_parse_agent_response():
     print(f"Image URL: {result_3['image_url']}")
     print(f"Agent: {result_3['agent']}")
     print()
-    
+
     # Test case 4: List with non-dict first item
     test_response_4 = '["simple string in list"]'
-    
+
     result_4 = parse_agent_response(test_response_4)
     print("Test 4 - List with non-dict item:")
     print(f"Answer: {result_4['answer']}")
@@ -67,4 +67,4 @@ def test_parse_agent_response():
     print(f"Agent: {result_4['agent']}")
 
 if __name__ == "__main__":
-    test_parse_agent_response() 
+    test_parse_agent_response()

@@ -1,8 +1,9 @@
 import os
-from openai import AzureOpenAI
 import time
 
 from dotenv import load_dotenv
+from openai import AzureOpenAI
+
 load_dotenv()
 
 # Retrieve credentials from .env file or environment

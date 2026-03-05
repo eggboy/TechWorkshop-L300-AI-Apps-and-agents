@@ -10,6 +10,7 @@ from azure.ai.projects.models import (
 )
 from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
+
 from services.handoff_service import IntentClassification
 
 load_dotenv()
@@ -17,7 +18,7 @@ load_dotenv()
 HANDOFF_AGENT_PROMPT_PATH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "prompts", "HandoffAgentPrompt.txt"
 )
-with open(HANDOFF_AGENT_PROMPT_PATH, "r", encoding="utf-8") as file:
+with open(HANDOFF_AGENT_PROMPT_PATH, encoding="utf-8") as file:
     HANDOFF_AGENT_PROMPT = file.read()
 
 project_endpoint = os.environ["FOUNDRY_ENDPOINT"]

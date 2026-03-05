@@ -1,23 +1,22 @@
-import asyncio
 import logging
 import os
 from collections.abc import AsyncIterable
 from enum import Enum
-from typing import TYPE_CHECKING, Annotated, Any, Literal
-import httpx
+from typing import Annotated, Any, Literal
+
 import openai
+from agent_framework import (
+    Agent,
+    AgentSession,
+    BaseChatClient,
+    ChatContext,
+    tool,
+)
+from agent_framework.azure import AzureOpenAIChatClient
+from agent_framework.openai import OpenAIChatClient
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from dotenv import load_dotenv
 from pydantic import BaseModel, ValidationError
-from agent_framework import (
-    AgentSession,
-    ChatContext,
-    Agent,
-    BaseChatClient,
-    tool,
-)
-from agent_framework.openai import OpenAIChatClient
-from agent_framework.azure import AzureOpenAIChatClient
 
 logger = logging.getLogger(__name__)
 load_dotenv()
@@ -294,7 +293,7 @@ class AgentFrameworkProductManagementAgent:
         structured_response = None
         try:
             structured_response = ResponseFormat.model_validate_json(message)
-        except ValidationError as e:
+        except ValidationError:
             logger.info("Message did not come in JSON format.")
             default_response = {"is_task_complete": True, "require_user_input": False, "content": message}
         except:

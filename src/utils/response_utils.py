@@ -1,7 +1,8 @@
 import json
 import re
+
 import orjson
-from utils.message_utils import fast_json_dumps
+
 
 def extract_bot_reply(msg) -> str:
     """Extract the bot reply from the agent processor message."""
@@ -21,7 +22,7 @@ def extract_product_names_from_response(response_data) -> str:
                 response_data = orjson.loads(response_data)
             except (orjson.JSONDecodeError, TypeError):
                 return ""
-        
+
         # Handle dictionary response
         if isinstance(response_data, dict):
             products = response_data.get("products")
@@ -37,7 +38,7 @@ def extract_product_names_from_response(response_data) -> str:
                     products_list = products
                 else:
                     return ""
-                
+
                 # Extract names from products
                 if products_list and isinstance(products_list, list):
                     names = []
@@ -46,14 +47,13 @@ def extract_product_names_from_response(response_data) -> str:
                             names.append(product["name"])
                     if names:
                         return f" [Products Mentioned: {', '.join(names)}]"
-        
+
         return ""
     except Exception:
         return ""
 
 def parse_agent_response(response: str) -> dict:
-    """
-    Parse agent response to check if it's JSON format.
+    """Parse agent response to check if it's JSON format.
     Handles JSON inside code blocks (```json ... ```),
     both objects and arrays, and also plain JSON strings.
     If it's JSON, map the fields accordingly.
@@ -128,7 +128,7 @@ def parse_agent_response(response: str) -> dict:
                 "additional_data": "",
                 "cart": []
             }
-    except (json.JSONDecodeError, TypeError) as e:
+    except (json.JSONDecodeError, TypeError):
         return {
             "answer": str(response),
             "agent": "",

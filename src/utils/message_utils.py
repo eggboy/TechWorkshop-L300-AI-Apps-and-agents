@@ -1,4 +1,5 @@
 import random
+
 import orjson
 
 IMAGE_UPLOAD_MESSAGES = [
@@ -24,7 +25,7 @@ IMAGE_ANALYSIS_MESSAGES = [
 ]
 
 def get_rotating_message(pool):
-    return random.choice(pool) 
+    return random.choice(pool)
 
 # Optimized JSON serialization function
 def fast_json_dumps(obj, **kwargs):

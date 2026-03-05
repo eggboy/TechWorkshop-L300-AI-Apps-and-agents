@@ -1,23 +1,23 @@
-from collections import deque
-from typing import Deque, Tuple
 import json
-import orjson
-import time
 import logging
+import time
+from collections import deque
+
+import orjson
+
 from utils.log_utils import log_timing
 
 logger = logging.getLogger(__name__)
 
-def format_chat_history(chat_history: Deque[Tuple[str, str]]) -> str:
+def format_chat_history(chat_history: deque[tuple[str, str]]) -> str:
     """Format chat history for the handoff prompt."""
     return "\n".join([
         f"user: {msg}" if role == "user" else f"bot: {msg}"
         for role, msg in chat_history
     ])
 
-def clean_conversation_history(history: Deque[Tuple[str, str]]) -> Deque[Tuple[str, str]]:
-    """
-    Clean conversation history by removing large product data and keeping only essential information.
+def clean_conversation_history(history: deque[tuple[str, str]]) -> deque[tuple[str, str]]:
+    """Clean conversation history by removing large product data and keeping only essential information.
     """
     cleaned_history = deque(maxlen=history.maxlen)
     for role, message in history:
@@ -51,7 +51,7 @@ def redact_bad_prompts_in_history(history, bad_prompts):
             redacted.append((role, msg))
     return redacted
 
-def parse_conversation_history(conversation_history: str, chat_history: Deque[Tuple[str, str]], user_message: str):
+def parse_conversation_history(conversation_history: str, chat_history: deque[tuple[str, str]], user_message: str):
     history_start_time = time.time()
     try:
         if conversation_history:
@@ -84,7 +84,7 @@ def parse_conversation_history(conversation_history: str, chat_history: Deque[Tu
         else:
             chat_history.append(("user", user_message))
         log_timing("History Parsing", history_start_time, f"History entries: {len(chat_history)}")
-    except Exception as e:
+    except Exception:
         logger.error("Error parsing conversation history", exc_info=True)
         chat_history.append(("user", user_message))
     return chat_history
